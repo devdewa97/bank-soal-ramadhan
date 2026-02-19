@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Moon, 
   Sun, 
@@ -51,6 +51,19 @@ const App = () => {
   
   const [selectedNote, setSelectedNote] = useState(null);
   const [formNote, setFormNote] = useState({ title: '', category: 'Soal Tausiyah Pagi', content: '' });
+
+  // Efek untuk mencegah zoom di mobile
+  useEffect(() => {
+    const viewportMeta = document.querySelector('meta[name="viewport"]');
+    if (viewportMeta) {
+      viewportMeta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = "viewport";
+      meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+      document.getElementsByTagName('head')[0].appendChild(meta);
+    }
+  }, []);
 
   const handleCopy = (text, id) => {
     const textArea = document.createElement("textarea");
