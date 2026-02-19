@@ -17,7 +17,12 @@ import {
   ChevronDown,
   BookOpen,
   UserCheck,
-  ShieldCheck
+  ShieldCheck,
+  Trash2,
+  AlertTriangle,
+  ChevronUp,
+  MessageSquareQuote,
+  CheckCircle
 } from 'lucide-react';
 
 // Konfigurasi Admin
@@ -33,12 +38,24 @@ const App = () => {
   const [loginData, setLoginData] = useState({ username: '', password: '' });
   const [loginError, setLoginError] = useState('');
   
+  // State untuk menyimpan ID accordion yang sedang terbuka
+  const [expandedId, setExpandedId] = useState(null);
+
   const [notes, setNotes] = useState([
-    { id: 1, title: 'Ketahanan Keluarga di Bulan Ramadhan', category: 'Soal Tausiyah Pagi', content: 'Keluarga adalah unit terkecil masyarakat. Di bulan Ramadhan, ketahanan keluarga diuji melalui kesabaran dan kebersamaan dalam beribadah.' },
-    { id: 2, title: 'Sensitifitas Sosial di Bulan Ramadhan', category: 'Soal Tausiyah Pagi', content: 'Puasa mengajarkan kita untuk merasakan lapar, sehingga tumbuh rasa empati terhadap saudara-saudara kita yang kurang beruntung.' },
-    { id: 3, title: 'Berbagi Kebaikan di Bulan Suci Ramadhan', category: 'Soal Tausiyah Pagi', content: 'Ramadhan adalah momentum terbaik untuk berbagi. Setiap kebaikan akan dilipatgandakan pahalanya.' },
-    { id: 10, title: 'Evaluasi Dekade Pertama', category: 'Soal Tausiyah Sore', content: 'Sepuluh hari pertama adalah fase Rahmat. Mari kita evaluasi kualitas ibadah kita sebelum memasuki fase Maghfirah.' },
-    { id: 11, title: 'Sabar Buah Utama Puasa', category: 'Soal Tausiyah Sore', content: 'Sabar bukan hanya menahan lapar, tapi juga menahan lisan dari ucapan yang sia-sia.' }
+    { 
+      id: 1, 
+      title: 'Ketahanan Keluarga di Bulan Ramadhan', 
+      category: 'Soal Tausiyah Pagi', 
+      content: 'Apa saja pilar utama dalam membangun ketahanan keluarga menurut perspektif Islam di bulan Ramadhan?',
+      jawaban: 'Pilar utamanya adalah kesabaran, ibadah berjamaah, komunikasi yang thoyyibah, dan saling memaafkan.'
+    },
+    { 
+      id: 2, 
+      title: 'Sensitifitas Sosial di Bulan Ramadhan', 
+      category: 'Soal Tausiyah Pagi', 
+      content: 'Bagaimana puasa dapat meningkatkan rasa empati kita terhadap kaum dhuafa?',
+      jawaban: 'Melalui rasa lapar yang dirasakan, kita menyadari kesulitan mereka dan terdorong untuk memperbanyak sedekah.'
+    }
   ]);
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -47,10 +64,11 @@ const App = () => {
   
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isDeleteAllConfirmOpen, setIsDeleteAllConfirmOpen] = useState(false);
   
   const [selectedNote, setSelectedNote] = useState(null);
-  const [formNote, setFormNote] = useState({ title: '', category: 'Soal Tausiyah Pagi', content: '' });
+  const [formNote, setFormNote] = useState({ title: '', category: 'Soal Tausiyah Pagi', content: '', jawaban: '' });
 
   // Efek untuk mencegah zoom di mobile
   useEffect(() => {
@@ -95,7 +113,7 @@ const App = () => {
     const newEntry = { ...formNote, id: Date.now() };
     setNotes([newEntry, ...notes]);
     setIsAddModalOpen(false);
-    setFormNote({ title: '', category: 'Soal Tausiyah Pagi', content: '' });
+    setFormNote({ title: '', category: 'Soal Tausiyah Pagi', content: '', jawaban: '' });
   };
 
   const handleEditNote = (e) => {
@@ -105,15 +123,34 @@ const App = () => {
     setSelectedNote(null);
   };
 
-  const openEdit = (note) => {
+  const handleDeleteNote = () => {
+    if (selectedNote) {
+      setNotes(notes.filter(n => n.id !== selectedNote.id));
+      setIsDeleteConfirmOpen(false);
+      setSelectedNote(null);
+    }
+  };
+
+  const handleDeleteAll = () => {
+    setNotes([]);
+    setIsDeleteAllConfirmOpen(false);
+  };
+
+  const toggleAccordion = (id) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
+
+  const openEdit = (e, note) => {
+    e.stopPropagation(); // Mencegah accordion terbuka/tertutup saat klik edit
     setSelectedNote(note);
-    setFormNote({ title: note.title, category: note.category, content: note.content });
+    setFormNote({ title: note.title, category: note.category, content: note.content, jawaban: note.jawaban || '' });
     setIsEditModalOpen(true);
   };
 
-  const openView = (note) => {
+  const openDeleteConfirm = (e, note) => {
+    e.stopPropagation();
     setSelectedNote(note);
-    setIsViewModalOpen(true);
+    setIsDeleteConfirmOpen(true);
   };
 
   const filteredNotes = useMemo(() => {
@@ -163,8 +200,8 @@ const App = () => {
         
         {/* Basmalah */}
         <div className="text-center mb-8 sm:mb-10">
-          <h2 className="text-amber-400/90 text-2xl sm:text-3xl font-serif mb-2 tracking-wide">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</h2>
-          <p className="text-emerald-600 text-[8px] sm:text-[9px] tracking-[0.4em] sm:tracking-[0.5em] font-bold uppercase opacity-50">Quiz Ramadhan 1447 H</p>
+          <h2 className="text-amber-400/90 text-2xl sm:text-3xl font-serif mb-2 tracking-wide text-center">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</h2>
+          <p className="text-emerald-600 text-[8px] sm:text-[9px] tracking-[0.4em] sm:tracking-[0.5em] font-bold uppercase opacity-50 text-center">Quiz Ramadhan 1447 H</p>
         </div>
 
         {/* Header Dashboard */}
@@ -184,7 +221,6 @@ const App = () => {
 
             {/* Profile & Logout */}
             <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
-               {/* Profile Info */}
                <div className="flex items-center gap-2.5 bg-white/5 px-3 py-1.5 rounded-md border border-white/5 flex-grow sm:flex-grow-0">
                   <div className="w-7 h-7 bg-emerald-800 rounded-md flex items-center justify-center shrink-0">
                      <UserCheck size={14} className="text-amber-400" />
@@ -201,12 +237,19 @@ const App = () => {
             </div>
           </div>
 
-          {/* Action Button - Only for Admin */}
           {user.canInput && (
-            <button onClick={() => setIsAddModalOpen(true)} className="w-full bg-amber-500 hover:bg-amber-400 text-[#04120b] font-bold py-2.5 rounded-md flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 text-[10px] sm:text-[11px] uppercase">
-              <Plus size={14} strokeWidth={3} />
-              Tambah Soal Baru
-            </button>
+            <div className="flex flex-col sm:flex-row gap-2 w-full">
+              <button onClick={() => setIsAddModalOpen(true)} className="flex-1 bg-amber-500 hover:bg-amber-400 text-[#04120b] font-bold py-2.5 rounded-md flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 text-[10px] sm:text-[11px] uppercase">
+                <Plus size={14} strokeWidth={3} />
+                Tambah Soal Baru
+              </button>
+              {notes.length > 0 && (
+                <button onClick={() => setIsDeleteAllConfirmOpen(true)} className="sm:w-auto bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20 font-bold py-2.5 px-4 rounded-md flex items-center justify-center gap-2 transition-all active:scale-95 text-[10px] sm:text-[11px] uppercase">
+                  <Trash2 size={14} />
+                  Hapus Semua
+                </button>
+              )}
+            </div>
           )}
         </header>
 
@@ -234,44 +277,96 @@ const App = () => {
           </div>
         </div>
 
-        {/* Question List */}
+        {/* Accordion Question List */}
         <div className="space-y-3">
-          {filteredNotes.map((note) => (
+          {filteredNotes.length > 0 ? filteredNotes.map((note) => (
             <div 
               key={note.id} 
-              className="bg-[#fcfaf2] rounded-md p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all hover:bg-white shadow-sm border border-emerald-100/50 group cursor-pointer text-left"
-              onClick={() => openView(note)}
+              className={`bg-[#fcfaf2] rounded-md transition-all border shadow-sm ${expandedId === note.id ? 'border-amber-400 ring-1 ring-amber-400/20' : 'border-emerald-100/50 hover:bg-white'}`}
             >
-              <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-grow overflow-hidden text-left">
-                <div className={`w-2 h-2 rounded-full shrink-0 mt-1.5 sm:mt-0 ${note.category === 'Soal Tausiyah Pagi' ? 'bg-blue-400' : 'bg-amber-500'}`}></div>
-                <div className="overflow-hidden">
-                  <h3 className="text-[#04120b] font-semibold text-sm sm:text-lg truncate tracking-tight mb-0.5 group-hover:text-amber-600 transition-colors text-left">{note.title}</h3>
-                  <div className="flex items-center gap-2">
+              {/* Accordion Header */}
+              <div 
+                className="p-4 sm:p-5 flex items-center justify-between gap-3 cursor-pointer select-none"
+                onClick={() => toggleAccordion(note.id)}
+              >
+                <div className="flex items-center gap-3 sm:gap-4 overflow-hidden flex-grow">
+                  <div className={`w-2 h-2 rounded-full shrink-0 ${note.category === 'Soal Tausiyah Pagi' ? 'bg-blue-400' : 'bg-amber-500'}`}></div>
+                  <div className="overflow-hidden">
+                    <h3 className={`font-semibold text-sm sm:text-lg truncate transition-colors text-left ${expandedId === note.id ? 'text-amber-600' : 'text-[#04120b]'}`}>
+                      {note.title}
+                    </h3>
                     <span className={`text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-sm border ${note.category === 'Soal Tausiyah Pagi' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-amber-50 text-amber-700 border-amber-100'}`}>
                        {note.category}
                     </span>
                   </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-emerald-50/50 justify-end" onClick={e => e.stopPropagation()}>
-                <button 
-                  onClick={() => handleCopy(note.content, note.id)}
-                  className="p-2 sm:p-2.5 bg-emerald-50 text-emerald-700 rounded-md hover:bg-amber-100 transition-all"
-                >
-                  {copySuccess === note.id ? <CheckCircle2 size={14} className="sm:w-[16px]" /> : <Copy size={14} className="sm:w-[16px]" />}
-                </button>
-                {user.canInput && (
-                  <button onClick={() => openEdit(note)} className="p-2 sm:p-2.5 bg-emerald-50 text-emerald-700 rounded-md hover:bg-emerald-100 transition-all">
-                    <Edit3 size={14} className="sm:w-[16px]" />
-                  </button>
-                )}
-                <div className="p-1.5 text-emerald-200 group-hover:text-amber-400">
-                  <ChevronDown size={16} />
+                <div className="flex items-center gap-2 shrink-0">
+                  {user.canInput && (
+                    <div className="flex items-center gap-1.5 mr-2" onClick={e => e.stopPropagation()}>
+                       <button onClick={(e) => openEdit(e, note)} className="p-2 bg-emerald-50 text-emerald-700 rounded-md hover:bg-emerald-100 transition-all" title="Edit">
+                         <Edit3 size={14} />
+                       </button>
+                       <button onClick={(e) => openDeleteConfirm(e, note)} className="p-2 bg-red-50 text-red-500 rounded-md hover:bg-red-500 hover:text-white transition-all border border-red-100" title="Hapus">
+                         <Trash2 size={14} />
+                       </button>
+                    </div>
+                  )}
+                  {expandedId === note.id ? <ChevronUp size={18} className="text-amber-500" /> : <ChevronDown size={18} className="text-emerald-300" />}
                 </div>
               </div>
+
+              {/* Accordion Content */}
+              {expandedId === note.id && (
+                <div className="px-4 pb-5 sm:px-6 sm:pb-6 pt-0 border-t border-emerald-50/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="space-y-5 mt-5">
+                    {/* Bagian Soal */}
+                    <div className="bg-emerald-50/40 p-4 rounded-md border border-emerald-100/50 relative">
+                       <div className="flex items-center gap-2 mb-2 text-emerald-700">
+                          <MessageSquareQuote size={16} />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Pertanyaan / Isi Soal</span>
+                       </div>
+                       <p className="text-[#04120b] leading-relaxed font-normal text-sm sm:text-base pr-10 text-left">
+                         "{note.content}"
+                       </p>
+                       {/* Tombol Salin Khusus Soal */}
+                       <button 
+                         onClick={() => handleCopy(note.content, note.id)}
+                         className="absolute top-4 right-4 p-2 bg-emerald-100 text-emerald-700 rounded-md hover:bg-emerald-200 transition-all active:scale-90"
+                         title="Salin Isi Soal"
+                       >
+                         {copySuccess === note.id ? <CheckCircle2 size={16} className="text-green-600" /> : <Copy size={16} />}
+                       </button>
+                    </div>
+
+                    {/* Bagian Jawaban */}
+                    <div className="bg-[#fff9ea] p-4 rounded-md border border-amber-100/50">
+                       <div className="flex items-center gap-2 mb-2 text-amber-700">
+                          <CheckCircle size={16} />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Kunci Jawaban</span>
+                       </div>
+                       <p className="text-[#04120b] leading-relaxed font-normal text-sm sm:text-base italic text-left">
+                         {note.jawaban || "Belum ada jawaban."}
+                       </p>
+                    </div>
+
+                    <div className="flex justify-end pt-2">
+                       <button 
+                         onClick={() => handleCopy(note.content, note.id)}
+                         className="bg-[#0a1f16] text-[#fbbf24] px-6 py-2 rounded-full font-bold uppercase tracking-widest text-[10px] flex items-center gap-2 hover:bg-[#122d21] shadow-md transition-all active:scale-95"
+                       >
+                         {copySuccess === note.id ? <><CheckCircle2 size={12}/> TERSALIN</> : <><Copy size={12}/> SALIN SOAL</>}
+                       </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          ))}
+          )) : (
+            <div className="py-12 text-center bg-white/5 rounded-md border border-white/5">
+              <BookOpen size={48} className="mx-auto mb-4 text-emerald-900/30" />
+              <p className="text-emerald-900/50 font-bold uppercase tracking-widest text-xs text-center">Belum ada materi soal</p>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -280,61 +375,22 @@ const App = () => {
             <div className="w-7 h-7 bg-emerald-900 rounded-md flex items-center justify-center border border-emerald-800/50 shadow-inner shrink-0">
                <ShieldCheck size={14} className="text-amber-500" />
             </div>
-            <p className="text-amber-500 font-bold uppercase tracking-widest text-[9px] sm:text-[11px]">
+            <p className="text-amber-500 font-bold uppercase tracking-widest text-[9px] sm:text-[11px] text-center">
               Bank Soal Tausiyah Ramadhan
             </p>
           </div>
-          <p className="text-emerald-300/60 text-[8px] sm:text-[9px] font-medium uppercase tracking-widest max-w-[280px] sm:max-w-xs mx-auto leading-relaxed mb-6">
+          <p className="text-emerald-300/60 text-[8px] sm:text-[9px] font-medium uppercase tracking-widest max-w-[280px] sm:max-w-xs mx-auto leading-relaxed mb-6 text-center">
             Platform Manajemen Materi Digital Khusus Sesi Ramadhan 1447 H
           </p>
           <div className="bg-white/5 inline-block px-3 py-1.5 rounded-md border border-white/5">
-            <p className="text-[8px] text-emerald-400/40 font-bold tracking-widest uppercase">
+            <p className="text-[8px] text-emerald-400/40 font-bold tracking-widest uppercase text-center">
               © 2026 Digital Da'wah System • Versi 1.2.0
             </p>
           </div>
         </footer>
       </div>
 
-      {/* MODAL VIEW / DETAIL - RESPONSIVE */}
-      {isViewModalOpen && selectedNote && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-[#04120b]/90 backdrop-blur-md overflow-y-auto animate-in fade-in duration-300">
-          <div className="bg-[#fcfaf2] rounded-md w-full max-w-2xl overflow-hidden shadow-2xl border border-emerald-100">
-            <div className="p-5 sm:p-10 text-left">
-              <div className="flex justify-between items-center mb-6 sm:mb-8">
-                <span className="px-3 py-1 rounded-sm text-[8px] sm:text-[9px] font-bold uppercase tracking-widest bg-blue-100 text-blue-700 border border-blue-200">
-                  {selectedNote.category}
-                </span>
-                <button onClick={() => setIsViewModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-[#e6f4ea] text-[#10b981] hover:bg-[#d1ebd8] transition-all">
-                  <X size={16} strokeWidth={3} />
-                </button>
-              </div>
-              
-              <h2 className="text-xl sm:text-3xl font-bold text-[#04120b] mb-6 sm:mb-8 leading-tight tracking-tight text-left">{selectedNote.title}</h2>
-              
-              <div className="bg-[#f0f4f1]/80 p-5 sm:p-10 rounded-md border border-[#10b981]/10 shadow-sm text-left">
-                <p className="text-[#04120b] leading-relaxed font-normal text-sm sm:text-lg">
-                  "{selectedNote.content}"
-                </p>
-              </div>
-              
-              <div className="mt-8 flex justify-end">
-                <button 
-                  onClick={() => handleCopy(selectedNote.content, selectedNote.id)}
-                  className="w-full sm:w-auto bg-[#0a1f16] text-[#fbbf24] px-6 py-2.5 rounded-full font-bold uppercase tracking-widest text-[9px] sm:text-[10px] flex items-center justify-center gap-3 hover:bg-[#122d21] transition-all active:scale-95 shadow-xl border border-white/5"
-                >
-                  {copySuccess === selectedNote.id ? (
-                    <><CheckCircle2 size={14} className="text-green-400" /> TERSALIN</>
-                  ) : (
-                    <><Copy size={14} /> SALIN ISI MATERI</>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL INPUT / EDIT - RESPONSIVE */}
+      {/* MODAL INPUT / EDIT - DENGAN FIELD JAWABAN */}
       {(isAddModalOpen || isEditModalOpen) && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-[#04120b]/90 backdrop-blur-md overflow-y-auto animate-in slide-in-from-bottom-5">
           <div className="bg-[#fcfaf2] rounded-md w-full max-w-xl overflow-hidden shadow-2xl border border-emerald-100">
@@ -343,14 +399,14 @@ const App = () => {
                  <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 fill-amber-500" />
                  <h2 className="text-lg sm:text-xl font-bold tracking-tight">{isAddModalOpen ? 'Tambah Soal' : 'Edit Soal'}</h2>
                </div>
-               <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="w-8 h-8 flex items-center justify-center rounded-md bg-white/5 hover:bg-white/10 text-emerald-500 transition-colors">
+               <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="relative z-10 w-8 h-8 flex items-center justify-center rounded-md bg-white/5 hover:bg-white/10 text-emerald-500 transition-colors">
                  <X size={18}/>
                </button>
             </div>
             
             <form onSubmit={isAddModalOpen ? handleAddNote : handleEditNote} className="p-5 sm:p-8 space-y-5 text-left">
-              <div className="space-y-1.5">
-                <label className="text-[9px] sm:text-[10px] font-bold text-emerald-900/40 uppercase tracking-widest ml-1 block">Judul Materi</label>
+              <div className="space-y-1.5 text-left">
+                <label className="text-[9px] sm:text-[10px] font-bold text-emerald-900/40 uppercase tracking-widest ml-1 block text-left">Judul Materi</label>
                 <input 
                   type="text" required value={formNote.title}
                   onChange={e => setFormNote({...formNote, title: e.target.value})}
@@ -359,9 +415,9 @@ const App = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[9px] sm:text-[10px] font-bold text-emerald-900/40 uppercase tracking-widest ml-1 block">Kategori</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-left">
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[9px] sm:text-[10px] font-bold text-emerald-900/40 uppercase tracking-widest ml-1 block text-left">Kategori</label>
                   <select 
                     value={formNote.category}
                     onChange={e => setFormNote({...formNote, category: e.target.value})}
@@ -371,9 +427,9 @@ const App = () => {
                     {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                   </select>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[9px] sm:text-[10px] font-bold text-emerald-900/40 uppercase tracking-widest ml-1 block">Warna Label</label>
-                  <div className="flex flex-wrap gap-2 py-1">
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[9px] sm:text-[10px] font-bold text-emerald-900/40 uppercase tracking-widest ml-1 block text-left">Warna Label</label>
+                  <div className="flex flex-wrap gap-2 py-1 justify-start">
                     {['#fbbf24', '#10b981', '#60a5fa', '#a78bfa', '#f87171', '#94a3b8'].map((c, i) => (
                       <div key={i} className={`w-6 h-6 sm:w-7 sm:h-7 rounded-sm border cursor-pointer ${i === 2 ? 'ring-2 ring-emerald-900 border-white shadow-md' : 'border-transparent'}`} style={{ backgroundColor: c }}></div>
                     ))}
@@ -381,21 +437,68 @@ const App = () => {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[9px] sm:text-[11px] font-bold text-emerald-900/40 uppercase tracking-widest ml-1 block">Isi Materi</label>
+              <div className="space-y-1.5 text-left">
+                <label className="text-[9px] sm:text-[11px] font-bold text-emerald-900/40 uppercase tracking-widest ml-1 block text-left">Isi Soal (Dapat Disalin)</label>
                 <textarea 
-                  required rows="4" value={formNote.content}
+                  required rows="3" value={formNote.content}
                   onChange={e => setFormNote({...formNote, content: e.target.value})}
-                  className="w-full bg-white border border-emerald-100 rounded-md px-4 py-2.5 text-[#04120b] font-normal text-sm sm:text-base outline-none resize-none leading-relaxed"
-                  placeholder="Tuliskan materi soal secara lengkap..."
+                  className="w-full bg-white border border-emerald-100 rounded-md px-4 py-2.5 text-[#04120b] font-normal text-sm sm:text-base outline-none resize-none leading-relaxed text-left"
+                  placeholder="Tuliskan pertanyaan/isi materi soal..."
+                ></textarea>
+              </div>
+
+              <div className="space-y-1.5 text-left">
+                <label className="text-[9px] sm:text-[11px] font-bold text-emerald-900/40 uppercase tracking-widest ml-1 block text-left">Jawaban Soal (Hanya Dilihat)</label>
+                <textarea 
+                  required rows="3" value={formNote.jawaban}
+                  onChange={e => setFormNote({...formNote, jawaban: e.target.value})}
+                  className="w-full bg-amber-50/30 border border-amber-100 rounded-md px-4 py-2.5 text-[#04120b] font-normal text-sm sm:text-base outline-none resize-none leading-relaxed text-left"
+                  placeholder="Tuliskan kunci jawaban dari soal di atas..."
                 ></textarea>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3">
-                <button type="button" onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="order-2 sm:order-1 flex-1 py-3 text-emerald-400 font-bold uppercase tracking-widest text-[9px] sm:text-[10px] hover:bg-emerald-50 rounded-md transition-colors">Batal</button>
-                <button className="order-1 sm:order-2 flex-1 bg-[#122d21] text-white font-bold py-3 rounded-md shadow-lg hover:bg-[#04120b] transition-all uppercase tracking-widest text-[9px] sm:text-[10px]">Simpan Data</button>
+                <button type="button" onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="order-2 sm:order-1 flex-1 py-3 text-emerald-400 font-bold uppercase tracking-widest text-[9px] sm:text-[10px] hover:bg-emerald-50 rounded-md transition-colors text-center">Batal</button>
+                <button className="order-1 sm:order-2 flex-1 bg-[#122d21] text-white font-bold py-3 rounded-md shadow-lg hover:bg-[#04120b] transition-all uppercase tracking-widest text-[9px] sm:text-[10px] text-center">Simpan Data</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL KONFIRMASI HAPUS - SAMA SEPERTI SEBELUMNYA */}
+      {isDeleteConfirmOpen && selectedNote && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-[#04120b]/90 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-white rounded-md w-full max-w-sm overflow-hidden shadow-2xl border border-red-100">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 size={32} />
+              </div>
+              <h3 className="text-lg font-bold text-emerald-950 mb-2 text-center">Hapus Soal?</h3>
+              <p className="text-sm text-emerald-900/60 mb-6 text-center">Apakah Anda yakin ingin menghapus soal <br/><span className="font-bold text-emerald-950">"{selectedNote.title}"</span>?</p>
+              <div className="flex gap-3">
+                <button onClick={() => setIsDeleteConfirmOpen(false)} className="flex-1 py-3 text-emerald-400 font-bold uppercase tracking-widest text-[10px] hover:bg-emerald-50 rounded-md transition-colors text-center">Batal</button>
+                <button onClick={handleDeleteNote} className="flex-1 bg-red-500 text-white font-bold py-3 rounded-md shadow-lg hover:bg-red-600 transition-all uppercase tracking-widest text-[10px] text-center">Ya, Hapus</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteAllConfirmOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-[#04120b]/90 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-white rounded-md w-full max-w-sm overflow-hidden shadow-2xl border border-red-100">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle size={32} />
+              </div>
+              <h3 className="text-lg font-bold text-emerald-950 mb-2 text-center">Hapus Semua?</h3>
+              <p className="text-sm text-emerald-900/60 mb-6 text-center">Seluruh bank soal akan dihapus secara permanen.</p>
+              <div className="flex flex-col gap-2">
+                <button onClick={handleDeleteAll} className="w-full bg-red-600 text-white font-bold py-4 rounded-md shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest text-[10px] text-center">Hapus Semua</button>
+                <button onClick={() => setIsDeleteAllConfirmOpen(false)} className="w-full py-3 text-emerald-400 font-bold uppercase tracking-widest text-[10px] hover:bg-emerald-50 rounded-md transition-colors text-center">Batal</button>
+              </div>
+            </div>
           </div>
         </div>
       )}
