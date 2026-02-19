@@ -46,8 +46,8 @@ const App = () => {
       id: 1, 
       title: 'Ketahanan Keluarga di Bulan Ramadhan', 
       category: 'Soal Tausiyah Pagi', 
-      content: 'Apa saja pilar utama dalam membangun ketahanan keluarga menurut perspektif Islam di bulan Ramadhan?',
-      jawaban: 'Pilar utamanya adalah kesabaran, ibadah berjamaah, komunikasi yang thoyyibah, dan saling memaafkan.'
+      content: 'Apa saja pilar utama dalam membangun ketahanan keluarga menurut perspektif Islam di bulan Ramadhan?\n1. Kesabaran\n2. Komunikasi\n3. Ibadah Bersama',
+      jawaban: 'Pilar utamanya adalah:\n- Kesabaran dalam menghadapi ujian\n- Ibadah berjamaah di rumah\n- Komunikasi yang thoyyibah\n- Saling memaafkan.'
     },
     { 
       id: 2, 
@@ -200,7 +200,7 @@ const App = () => {
         
         {/* Basmalah */}
         <div className="text-center mb-8 sm:mb-10">
-          <h2 className="text-amber-400/90 text-2xl sm:text-3xl font-serif mb-2 tracking-wide text-center">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</h2>
+          <h2 className="text-amber-400/90 text-2xl sm:text-3xl font-serif mb-2 tracking-wide text-center uppercase">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</h2>
           <p className="text-emerald-600 text-[8px] sm:text-[9px] tracking-[0.4em] sm:tracking-[0.5em] font-bold uppercase opacity-50 text-center">Quiz Ramadhan 1447 H</p>
         </div>
 
@@ -319,16 +319,15 @@ const App = () => {
               {expandedId === note.id && (
                 <div className="px-4 pb-5 sm:px-6 sm:pb-6 pt-0 border-t border-emerald-50/50 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-5 mt-5">
-                    {/* Bagian Soal */}
+                    {/* Bagian Soal - Preservasi Baris Baru */}
                     <div className="bg-emerald-50/40 p-4 rounded-md border border-emerald-100/50 relative">
                        <div className="flex items-center gap-2 mb-2 text-emerald-700">
                           <MessageSquareQuote size={16} />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Pertanyaan / Isi Soal</span>
                        </div>
-                       <p className="text-[#04120b] leading-relaxed font-normal text-sm sm:text-base pr-10 text-left">
-                         "{note.content}"
+                       <p className="text-[#04120b] leading-relaxed font-normal text-sm sm:text-base pr-10 text-left whitespace-pre-wrap">
+                         {note.content}
                        </p>
-                       {/* Tombol Salin Khusus Soal */}
                        <button 
                          onClick={() => handleCopy(note.content, note.id)}
                          className="absolute top-4 right-4 p-2 bg-emerald-100 text-emerald-700 rounded-md hover:bg-emerald-200 transition-all active:scale-90"
@@ -338,13 +337,13 @@ const App = () => {
                        </button>
                     </div>
 
-                    {/* Bagian Jawaban */}
+                    {/* Bagian Jawaban - Preservasi Baris Baru */}
                     <div className="bg-[#fff9ea] p-4 rounded-md border border-amber-100/50">
                        <div className="flex items-center gap-2 mb-2 text-amber-700">
                           <CheckCircle size={16} />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Kunci Jawaban</span>
                        </div>
-                       <p className="text-[#04120b] leading-relaxed font-normal text-sm sm:text-base italic text-left">
+                       <p className="text-[#04120b] leading-relaxed font-normal text-sm sm:text-base text-left whitespace-pre-wrap">
                          {note.jawaban || "Belum ada jawaban."}
                        </p>
                     </div>
@@ -363,7 +362,7 @@ const App = () => {
             </div>
           )) : (
             <div className="py-12 text-center bg-white/5 rounded-md border border-white/5">
-              <BookOpen size={48} className="mx-auto mb-4 text-emerald-900/30" />
+              <BookOpen size={48} className="mx-auto mb-4 text-emerald-900/30 text-center" />
               <p className="text-emerald-900/50 font-bold uppercase tracking-widest text-xs text-center">Belum ada materi soal</p>
             </div>
           )}
@@ -466,7 +465,7 @@ const App = () => {
         </div>
       )}
 
-      {/* MODAL KONFIRMASI HAPUS - SAMA SEPERTI SEBELUMNYA */}
+      {/* MODAL KONFIRMASI HAPUS */}
       {isDeleteConfirmOpen && selectedNote && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-[#04120b]/90 backdrop-blur-md animate-in fade-in duration-300">
           <div className="bg-white rounded-md w-full max-w-sm overflow-hidden shadow-2xl border border-red-100">
